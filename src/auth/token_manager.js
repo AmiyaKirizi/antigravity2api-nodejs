@@ -75,7 +75,7 @@ class TokenManager {
       this.loadRotationConfig();
 
       if (this.tokens.length === 0) {
-        log.warn('⚠ 暂无可用账号，请使用以下方式添加：');
+        log.warn('⚠ No account is currently available. Please add one using one of the following methods:');
         log.warn('  方式1: 运行 npm run login 命令登录');
         log.warn('  方式2: 访问前端管理页面添加账号');
       } else {

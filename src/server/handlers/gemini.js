@@ -111,7 +111,7 @@ export const handleGeminiRequest = async (req, res, modelName, isStream) => {
 
     const token = await tokenManager.getToken(modelName);
     if (!token) {
-      throw new Error('没有可用的token，请运行 npm run login 获取token');
+      throw new Error('No token is available. Please run npm run login to obtain a token');
     }
 
     // 获取 tokenId 用于冷却状态管理

@@ -75,7 +75,7 @@ class GeminiCliTokenManager {
       this.loadRotationConfig();
 
       if (this.tokens.length === 0) {
-        log.warn('[GeminiCLI] ⚠ 暂无可用账号，请使用以下方式添加：');
+        log.warn('[GeminiCLI] ⚠ No account is currently available. Please add one using one of the following methods:');
         log.warn('[GeminiCLI]   方式1: 访问前端管理页面添加账号');
         log.warn('[GeminiCLI]   方式2: 手动编辑 geminicli_accounts.json');
       } else {

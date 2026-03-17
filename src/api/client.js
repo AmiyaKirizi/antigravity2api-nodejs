@@ -325,7 +325,7 @@ export async function getAvailableModels() {
   const token = await tokenManager.getToken();
   if (!token) {
     // 没有 token 时返回默认模型列表
-    logger.warn('没有可用的 token，返回默认模型列表');
+    logger.warn('No token is available, returning the default model list');
     return getDefaultModelList();
   }
 

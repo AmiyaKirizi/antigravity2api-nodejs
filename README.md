@@ -106,6 +106,7 @@ Common endpoints include:
 - `POST /sdapi/v1/img2img`
 
 See [API_EN.md](/Users/lu.t/Desktop/phd_files/proxy_antigravity/API_EN.md) for a compact English API guide.
+See [MODEL_LIST_AND_SAMPLE_REQUEST.md](/Users/lu.t/Desktop/phd_files/proxy_antigravity/MODEL_LIST_AND_SAMPLE_REQUEST.md) for a quick copy-paste example covering model listing and a sample chat request.
 
 ## Notes
 

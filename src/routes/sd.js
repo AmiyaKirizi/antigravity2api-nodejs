@@ -123,7 +123,7 @@ router.post('/img2img', async (req, res) => {
     
     const token = await tokenManager.getToken();
     if (!token) {
-      throw new Error('没有可用的token');
+      throw new Error('No token is available');
     }
     
     // 构建包含图片的消息
@@ -167,7 +167,7 @@ router.post('/txt2img', async (req, res) => {
     
     const token = await tokenManager.getToken();
     if (!token) {
-      throw new Error('没有可用的token');
+      throw new Error('No token is available');
     }
     
     const requestBody = buildImageRequestBody(prompt, token);

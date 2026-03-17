@@ -997,7 +997,7 @@ router.get('/tokens/:tokenId/quotas', cookieAuthMiddleware, async (req, res) => 
         } catch (error) {
           logger.error('刷新token失败:', error.message);
           // 使用 400 而不是 401，避免前端误认为 JWT 登录过期
-          return res.status(400).json({ success: false, message: 'Google Token已过期且刷新失败，请重新登录Google账号' });
+          return res.status(400).json({ success: false, message: 'The Google token expired and refresh failed. Please sign in to your Google account again' });
         }
       }
 
