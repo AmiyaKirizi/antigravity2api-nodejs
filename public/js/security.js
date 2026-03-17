@@ -4,13 +4,13 @@ async function loadBlockedIPs() {
   try {
     const response = await authFetch('/admin/blocked-ips');
     
-    if (!response.ok) throw new Error('获取封禁列表失败');
+    if (!response.ok) throw new Error('Failed to fetch blocked IPs');
     
     const data = await response.json();
     renderBlockedIPs(data.data);
   } catch (error) {
     console.error('加载封禁列表失败:', error);
-    showToast('加载封禁列表失败', 'error');
+    showToast('Failed to load blocked IPs', 'error');
   }
 }
 
@@ -18,7 +18,7 @@ function renderBlockedIPs(blockedIPs) {
   const container = document.getElementById('blockedIPsList');
   
   if (!blockedIPs || blockedIPs.length === 0) {
-    container.innerHTML = '<div class="empty-state-small">暂无封禁IP</div>';
+    container.innerHTML = '<div class="empty-state-small">No blocked IPs</div>';
     return;
   }
   
@@ -32,16 +32,16 @@ function renderBlockedIPs(blockedIPs) {
         <div class="blocked-ip-header">
           <span class="blocked-ip-address">${item.ip}</span>
           <span class="blocked-ip-type ${isPermanent ? 'permanent' : 'temporary'}">
-            ${isPermanent ? '永久封禁' : '临时封禁'}
+            ${isPermanent ? 'Permanent Block' : 'Temporary Block'}
           </span>
         </div>
         <div class="blocked-ip-info">
-          ${!isPermanent && expiresAt ? `<div>⏰ 解封时间: ${expiresAt}</div>` : ''}
-          <div>🔢 累计封禁: ${tempBlockCount} 次</div>
+          ${!isPermanent && expiresAt ? `<div>⏰ Unblock time: ${expiresAt}</div>` : ''}
+          <div>🔢 Total blocks: ${tempBlockCount} times</div>
         </div>
         <div class="blocked-ip-actions">
           <button class="btn btn-sm btn-warning" onclick="unblockIP('${item.ip}')">
-            🔓 解除封禁
+            🔓 Unblock
           </button>
         </div>
       </div>
@@ -50,7 +50,7 @@ function renderBlockedIPs(blockedIPs) {
 }
 
 async function unblockIP(ip) {
-  if (!confirm(`确定要解除 ${ip} 的封禁吗？`)) return;
+  if (!confirm(`Are you sure you want to unblock ${ip}?`)) return;
   
   try {
     const response = await authFetch('/admin/unblock-ip', {
@@ -62,14 +62,14 @@ async function unblockIP(ip) {
     const data = await response.json();
     
     if (data.success) {
-      showToast(data.message || 'IP已解除封禁', 'success');
+      showToast(data.message || 'IP unblocked', 'success');
       loadBlockedIPs();
     } else {
-      showToast(data.message || '解除封禁失败', 'error');
+      showToast(data.message || 'Failed to unblock IP', 'error');
     }
   } catch (error) {
     console.error('解除封禁失败:', error);
-    showToast('解除封禁失败', 'error');
+    showToast('Failed to unblock IP', 'error');
   }
 }
 
@@ -97,14 +97,14 @@ function renderWhitelistIPs(ips) {
   const container = document.getElementById('whitelistIPsList');
   
   if (!ips || ips.length === 0) {
-    container.innerHTML = '<div class="empty-state-small">暂无白名单IP</div>';
+    container.innerHTML = '<div class="empty-state-small">No whitelisted IPs</div>';
     return;
   }
   
   container.innerHTML = ips.map(ip => `
     <div class="whitelist-ip-tag">
       <span>${ip}</span>
-      <button onclick="removeWhitelistIP('${ip}')" title="移除">✕</button>
+      <button onclick="removeWhitelistIP('${ip}')" title="Remove">✕</button>
     </div>
   `).join('');
 }
@@ -117,20 +117,20 @@ function addWhitelistIP() {
   const ip = input.value.trim();
   
   if (!ip) {
-    showToast('请输入IP地址', 'warning');
+    showToast('Please enter an IP address', 'warning');
     return;
   }
   
   // 简单的IP格式验证
   const ipPattern = /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/;
   if (!ipPattern.test(ip)) {
-    showToast('IP地址格式不正确', 'warning');
+    showToast('Invalid IP address format', 'warning');
     return;
   }
   
   // 检查是否已存在
   if (tempWhitelistIPs.includes(ip)) {
-    showToast('该IP已在白名单中', 'warning');
+    showToast('This IP is already whitelisted', 'warning');
     return;
   }
   

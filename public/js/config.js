@@ -12,7 +12,7 @@ function restoreDefaultSystemInstruction() {
     const textarea = document.querySelector('textarea[name="SYSTEM_INSTRUCTION"]');
     if (textarea) {
         textarea.value = DEFAULT_SYSTEM_INSTRUCTION;
-        showToast('已恢复默认反代系统提示词', 'success');
+        showToast('Restored the default proxy system prompt', 'success');
     }
 }
 
@@ -21,7 +21,7 @@ function restoreDefaultOfficialSystemPrompt() {
     const textarea = document.querySelector('textarea[name="OFFICIAL_SYSTEM_PROMPT"]');
     if (textarea) {
         textarea.value = DEFAULT_OFFICIAL_SYSTEM_PROMPT;
-        showToast('已恢复默认官方系统提示词', 'success');
+        showToast('Restored the default official system prompt', 'success');
     }
 }
 
@@ -37,7 +37,7 @@ function normalizeNewlines(str) {
 
 // 解锁官方系统提示词修改
 async function unlockOfficialSystemPrompt() {
-    const warningMsg = '<span style="color:#ef4444;font-weight:bold;font-size:1rem;">⚠️ 警告！修改官方系统提示词可能会导致 429 错误！<br>是否确认更改？</span>';
+    const warningMsg = '<span style="color:#ef4444;font-weight:bold;font-size:1rem;">⚠️ Warning: changing the official system prompt may cause 429 errors.<br>Do you want to continue?</span>';
     const password = await showPasswordPrompt(warningMsg);
 
     if (password) {
@@ -56,7 +56,7 @@ async function unlockOfficialSystemPrompt() {
         // CSS handles lock button visibility based on readonly state
         if (restoreBtn) restoreBtn.style.display = 'inline-flex';
 
-        showToast('已解锁，请谨慎修改', 'warning');
+        showToast('Unlocked. Please edit carefully', 'warning');
     }
 }
 
@@ -92,17 +92,17 @@ async function loadRotationStatus() {
         if (data.success) {
             const { strategy, requestCount, currentIndex } = data.data;
             const strategyNames = {
-                'round_robin': '均衡负载',
-                'quota_exhausted': '额度耗尽切换',
-                'request_count': '自定义次数'
+                'round_robin': 'Round Robin',
+                'quota_exhausted': 'Switch When Quota Is Exhausted',
+                'request_count': 'Custom Request Count'
             };
             const statusEl = document.getElementById('currentRotationInfo');
             if (statusEl) {
                 let statusText = `${strategyNames[strategy] || strategy}`;
                 if (strategy === 'request_count') {
-                    statusText += ` (每${requestCount}次)`;
+                    statusText += ` (every ${requestCount} requests)`;
                 }
-                statusText += ` | 当前索引: ${currentIndex}`;
+                statusText += ` | Current index: ${currentIndex}`;
                 statusEl.textContent = statusText;
             }
         }
@@ -197,7 +197,7 @@ async function loadConfig() {
             }
         }
     } catch (error) {
-        showToast('加载配置失败: ' + error.message, 'error');
+        showToast('Failed to load configuration: ' + error.message, 'error');
     }
 }
 
@@ -345,7 +345,7 @@ async function saveConfig(e) {
         }
     });
 
-    showLoading('正在保存配置...');
+    showLoading('Saving settings...');
 
     // 检查官方系统提示词是否真正修改了
     const currentPrompt = envConfig.OFFICIAL_SYSTEM_PROMPT;
@@ -405,16 +405,16 @@ async function saveConfig(e) {
 
         hideLoading();
         if (data.success) {
-            showToast('配置已保存', 'success');
+            showToast('Settings saved', 'success');
             // 保存成功后重新锁定
             lockOfficialSystemPrompt();
             loadConfig();
         } else {
-            showToast(data.message || '保存失败', 'error');
+            showToast(data.message || 'Save failed', 'error');
         }
     } catch (error) {
         hideLoading();
-        showToast('保存失败: ' + error.message, 'error');
+        showToast('Save failed: ' + error.message, 'error');
     }
 }
 

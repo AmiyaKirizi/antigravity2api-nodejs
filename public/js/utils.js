@@ -60,13 +60,13 @@ function updateSensitiveBtn() {
     const btn = document.getElementById('toggleSensitiveBtn');
     if (btn) {
         if (sensitiveInfoHidden) {
-            btn.innerHTML = '🙈 隐藏';
-            btn.title = '点击显示敏感信息';
+            btn.innerHTML = '🙈 Hide';
+            btn.title = 'Click to show sensitive info';
             btn.classList.remove('btn-info');
             btn.classList.add('btn-secondary');
         } else {
-            btn.innerHTML = '👁️ 显示';
-            btn.title = '点击隐藏敏感信息';
+            btn.innerHTML = '👁️ Show';
+            btn.title = 'Click to hide sensitive info';
             btn.classList.remove('btn-secondary');
             btn.classList.add('btn-info');
         }

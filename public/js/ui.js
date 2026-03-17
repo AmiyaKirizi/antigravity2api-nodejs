@@ -35,7 +35,7 @@ const toastManager = {
 
 function showToast(message, type = 'info', title = '') {
     const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    const titles = { success: '成功', error: '错误', warning: '警告', info: '提示' };
+    const titles = { success: 'Success', error: 'Error', warning: 'Warning', info: 'Info' };
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     // 转义用户输入防止 XSS
@@ -65,7 +65,7 @@ function showToast(message, type = 'info', title = '') {
     setTimeout(removeToast, 3000);
 }
 
-function showConfirm(message, title = '确认操作') {
+function showConfirm(message, title = 'Confirm Action') {
     return new Promise((resolve) => {
         const modal = document.createElement('div');
         modal.className = 'modal';
@@ -77,8 +77,8 @@ function showConfirm(message, title = '确认操作') {
                 <div class="modal-title">${safeTitle}</div>
                 <div class="modal-message">${safeMessage}</div>
                 <div class="modal-actions">
-                    <button class="btn btn-secondary" id="confirmCancelBtn">取消</button>
-                    <button class="btn btn-danger" id="confirmOkBtn">确定</button>
+                    <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+                    <button class="btn btn-danger" id="confirmOkBtn">Confirm</button>
                 </div>
             </div>
         `;
@@ -121,7 +121,7 @@ function showConfirm(message, title = '确认操作') {
 // 存储当前 loading overlay 引用
 let currentLoadingOverlay = null;
 
-function showLoading(text = '处理中...') {
+function showLoading(text = 'Processing...') {
     // 如果已有 loading，先移除
     hideLoading();
 
@@ -286,13 +286,13 @@ function wireJsonFileDropzone({ dropzone, fileInput, onFile, onError } = {}) {
     const handlePickedFile = (file) => {
         if (!file) return;
         if (!isJsonFile(file)) {
-            safeOnError('请选择 JSON 文件');
+            safeOnError('Please choose a JSON file');
             return;
         }
         try {
             onFile && onFile(file);
         } catch (err) {
-            safeOnError('处理文件失败: ' + (err?.message || String(err)));
+            safeOnError('Failed to process file: ' + (err?.message || String(err)));
         }
     };
 

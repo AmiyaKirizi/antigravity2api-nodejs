@@ -55,16 +55,16 @@ async function fetchProjectId(event, tokenId) {
 
         const data = await response.json();
         if (data.success) {
-            showToast(`Project ID 获取成功: ${data.projectId}`, 'success');
+            showToast(`Project ID fetched successfully: ${data.projectId}`, 'success');
             loadTokens(); // 刷新列表
         } else {
-            showToast(`获取失败: ${data.message || '未知错误'}`, 'error');
+            showToast(`Fetch failed: ${data.message || 'Unknown error'}`, 'error');
             btn.disabled = false;
             btn.textContent = '🔍';
         }
     } catch (error) {
         if (error.message !== 'Unauthorized') {
-            showToast(`获取失败: ${error.message}`, 'error');
+            showToast(`Fetch failed: ${error.message}`, 'error');
         }
         btn.disabled = false;
         btn.textContent = '🔍';
@@ -74,25 +74,25 @@ async function fetchProjectId(event, tokenId) {
 // 批量获取所有 Token 的 Project ID
 async function batchFetchProjectIds() {
     if (!cachedTokens || cachedTokens.length === 0) {
-        showToast('没有可用的 Token', 'warning');
+        showToast('No tokens available', 'warning');
         return;
     }
 
     // 只获取启用的 Token
     const enabledTokens = cachedTokens.filter(t => t.enable);
     if (enabledTokens.length === 0) {
-        showToast('没有启用的 Token', 'warning');
+        showToast('No enabled tokens found', 'warning');
         return;
     }
 
-    showLoading(`正在批量获取 Project ID (0/${enabledTokens.length})...`);
+    showLoading(`Fetching Project IDs in batch (0/${enabledTokens.length})...`);
 
     let successCount = 0;
     let failCount = 0;
 
     for (let i = 0; i < enabledTokens.length; i++) {
         const token = enabledTokens[i];
-        updateLoadingText(`正在批量获取 Project ID (${i + 1}/${enabledTokens.length})...`);
+        updateLoadingText(`Fetching Project IDs in batch (${i + 1}/${enabledTokens.length})...`);
 
         try {
             const response = await authFetch(`/admin/tokens/${encodeURIComponent(token.id)}/fetch-project-id`, {
@@ -115,7 +115,7 @@ async function batchFetchProjectIds() {
     }
 
     hideLoading();
-    showToast(`批量获取完成: 成功 ${successCount} 个，失败 ${failCount} 个`, successCount > 0 ? 'success' : 'error');
+    showToast(`Batch fetch completed: success ${successCount}, failed ${failCount}`, successCount > 0 ? 'success' : 'error');
     loadTokens(); // 刷新列表
 }
 
@@ -129,10 +129,10 @@ function updateLoadingText(text) {
 
 // 导出 Token（需要密码验证）
 async function exportTokens() {
-    const password = await showPasswordPrompt('请输入管理员密码以导出 Token');
+    const password = await showPasswordPrompt('Please enter the admin password to export tokens');
     if (!password) return;
 
-    showLoading('正在导出...');
+    showLoading('Exporting...');
     try {
         const response = await authFetch('/admin/tokens/export', {
             method: 'POST',
@@ -154,18 +154,18 @@ async function exportTokens() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast('导出成功', 'success');
+            showToast('Export successful', 'success');
         } else {
             // 密码错误或其他错误时显示具体错误信息
             if (response.status === 403) {
-                showToast('密码错误，请重新输入', 'error');
+                showToast('Incorrect password, please try again', 'error');
             } else {
-                showToast(data.message || '导出失败', 'error');
+                showToast(data.message || 'Export failed', 'error');
             }
         }
     } catch (error) {
         hideLoading();
-        showToast('导出失败: ' + error.message, 'error');
+        showToast('Export failed: ' + error.message, 'error');
     }
 }
 
@@ -174,7 +174,7 @@ async function importTokens() {
     showImportUploadModal();
 }
 
-// 当前导入模式：'file' | 'json' | 'manual'
+// 当前Import Mode：'file' | 'json' | 'manual'
 let currentImportTab = 'file';
 
 // 存储导入弹窗的事件处理器引用
@@ -187,21 +187,21 @@ function showImportUploadModal() {
     modal.id = 'importUploadModal';
     modal.innerHTML = `
         <div class="modal-content modal-lg">
-            <div class="modal-title">📥 添加/导入 Token</div>
+            <div class="modal-title">📥 Add/Import Tokens</div>
             
             <!-- 导入方式切换标签 -->
             <div class="import-tabs">
-                <button class="import-tab active" data-tab="file" onclick="switchImportTab('file')">📁 文件上传</button>
-                <button class="import-tab" data-tab="json" onclick="switchImportTab('json')">📝 JSON导入</button>
-                <button class="import-tab" data-tab="manual" onclick="switchImportTab('manual')">✏️ 手动填入</button>
+                <button class="import-tab active" data-tab="file" onclick="switchImportTab('file')">📁 Upload File</button>
+                <button class="import-tab" data-tab="json" onclick="switchImportTab('json')">📝 Import JSON</button>
+                <button class="import-tab" data-tab="manual" onclick="switchImportTab('manual')">✏️ Enter Manually</button>
             </div>
             
             <!-- 文件上传区域 -->
             <div class="import-tab-content" id="importTabFile">
                 <div class="import-dropzone" id="importDropzone">
                     <div class="dropzone-icon">📁</div>
-                    <div class="dropzone-text">拖拽文件到此处</div>
-                    <div class="dropzone-hint">或点击选择文件</div>
+                    <div class="dropzone-text">Drag a file here</div>
+                    <div class="dropzone-hint">or click to choose a file</div>
                     <input type="file" id="importFileInput" accept=".json" style="display: none;">
                 </div>
                 <div class="import-file-info hidden" id="importFileInfo">
@@ -217,11 +217,11 @@ function showImportUploadModal() {
             <!-- 手动输入JSON区域 -->
             <div class="import-tab-content hidden" id="importTabJson">
                 <div class="form-group">
-                    <label>📝 粘贴 JSON 内容</label>
+                    <label>📝 Paste JSON content</label>
                     <textarea id="importJsonInput" rows="8" placeholder='{"tokens": [...], "exportTime": "..."}'></textarea>
                 </div>
                 <div class="import-json-actions">
-                    <button class="btn btn-sm btn-info" onclick="parseImportJson()">🔍 解析 JSON</button>
+                    <button class="btn btn-sm btn-info" onclick="parseImportJson()">🔍 Parse JSON</button>
                     <span class="import-json-status" id="importJsonStatus"></span>
                 </div>
             </div>
@@ -230,45 +230,45 @@ function showImportUploadModal() {
             <div class="import-tab-content hidden" id="importTabManual">
                 <div class="form-group">
                     <label>🔑 Access Token <span style="color: var(--danger);">*</span></label>
-                    <input type="text" id="manualAccessToken" placeholder="Access Token (必填)" autocomplete="off">
+                    <input type="text" id="manualAccessToken" placeholder="Access Token (required)" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>🔄 Refresh Token <span style="color: var(--danger);">*</span></label>
-                    <input type="text" id="manualRefreshToken" placeholder="Refresh Token (必填)" autocomplete="off">
+                    <input type="text" id="manualRefreshToken" placeholder="Refresh Token (required)" autocomplete="off">
                 </div>
                 <div class="form-group">
                     <label>📁 Project ID</label>
                     <div style="display: flex; gap: 0.5rem;">
-                        <input type="text" id="manualProjectId" placeholder="Project ID (可选，留空则自动获取)" style="flex: 1;" autocomplete="off">
-                        <button class="btn btn-sm btn-info" id="fetchProjectIdBtn" onclick="fetchProjectIdForManual()" style="white-space: nowrap;">🔍 自动获取</button>
+                        <input type="text" id="manualProjectId" placeholder="Project ID (optional, leave blank to fetch automatically)" style="flex: 1;" autocomplete="off">
+                        <button class="btn btn-sm btn-info" id="fetchProjectIdBtn" onclick="fetchProjectIdForManual()" style="white-space: nowrap;">🔍 Auto Fetch</button>
                     </div>
-                    <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">💡 可以手动填写，或填写 Token 后点击“自动获取”</p>
+                    <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">💡 You can enter it manually, or fill in the tokens first and click "Auto Fetch"</p>
                 </div>
                 <div class="form-group">
-                    <label>⏱️ 有效期(秒)</label>
-                    <input type="number" id="manualExpiresIn" placeholder="有效期(秒)" value="3599" autocomplete="off">
+                    <label>⏱️ Expires In (seconds)</label>
+                    <input type="number" id="manualExpiresIn" placeholder="Expires In (seconds)" value="3599" autocomplete="off">
                 </div>
-                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem;">💡 有效期默认3599秒(约1小时)，手动填入不需要密码验证</p>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem;">💡 The default expiry is 3599 seconds (about 1 hour). Manual entry does not require password verification</p>
             </div>
             
-            <!-- 导入模式（仅文件上传和JSON导入时显示） -->
+            <!-- Import Mode（仅文件上传和JSON导入时显示） -->
             <div class="form-group" id="importModeGroup">
-                <label>导入模式</label>
+                <label>Import Mode</label>
                 <select id="importMode">
-                    <option value="merge">合并（保留现有，添加新的）</option>
-                    <option value="replace">替换（清空现有，导入新的）</option>
+                    <option value="merge">Merge (keep existing items and add new ones)</option>
+                    <option value="replace">Replace (clear existing items and import new ones)</option>
                 </select>
             </div>
             
             <!-- 密码验证（仅文件上传和JSON导入时显示） -->
             <div class="form-group" id="importPasswordGroup">
-                <label>🔐 管理员密码</label>
-                <input type="password" id="importPassword" placeholder="请输入管理员密码验证">
+                <label>🔐 Admin Password</label>
+                <input type="password" id="importPassword" placeholder="Enter the admin password for verification">
             </div>
             
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeImportModal()">取消</button>
-                <button class="btn btn-success" id="confirmImportBtn" onclick="confirmImportFromModal()" disabled>✅ 确认</button>
+                <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+                <button class="btn btn-success" id="confirmImportBtn" onclick="confirmImportFromModal()" disabled>✅ Confirmation</button>
             </div>
         </div>
     `;
@@ -338,25 +338,25 @@ function switchImportTab(tab) {
     document.getElementById('importTabJson').classList.toggle('hidden', tab !== 'json');
     document.getElementById('importTabManual').classList.toggle('hidden', tab !== 'manual');
 
-    // 切换导入模式和密码输入的显示
+    // 切换Import Mode和密码输入的显示
     const importModeGroup = document.getElementById('importModeGroup');
     const importPasswordGroup = document.getElementById('importPasswordGroup');
     const confirmBtn = document.getElementById('confirmImportBtn');
 
     if (tab === 'manual') {
-        // 手动填入模式：隐藏导入模式和密码
+        // 手动填入模式：隐藏Import Mode和密码
         importModeGroup.classList.add('hidden');
         importPasswordGroup.classList.add('hidden');
         // 更新按钮状态
         const accessToken = document.getElementById('manualAccessToken').value.trim();
         const refreshToken = document.getElementById('manualRefreshToken').value.trim();
         confirmBtn.disabled = !accessToken || !refreshToken;
-        confirmBtn.textContent = '✅ 添加';
+        confirmBtn.textContent = '✅ Add';
     } else {
-        // 文件上传或JSON导入模式：显示导入模式和密码
+        // 文件上传或JSONImport Mode：显示Import Mode和密码
         importModeGroup.classList.remove('hidden');
         importPasswordGroup.classList.remove('hidden');
-        confirmBtn.textContent = '✅ 确认导入';
+        confirmBtn.textContent = '✅ Confirm Import';
 
         // 清除之前的数据
         if (tab === 'file') {
@@ -442,7 +442,7 @@ function smartParseImportData(jsonText) {
             const arrayText = '[' + cleanText.replace(/\}\s*\{/g, '},{') + ']';
             data = JSON.parse(arrayText);
         } catch (e2) {
-            return { success: false, message: `JSON 解析错误: ${e.message}` };
+            return { success: false, message: `JSON parse error: ${e.message}` };
         }
     }
 
@@ -466,7 +466,7 @@ function smartParseImportData(jsonText) {
     }
 
     if (tokensArray.length === 0) {
-        return { success: false, message: '未找到有效数据，请确保包含 refresh_token 和 projectId' };
+        return { success: false, message: 'No valid data found. Please make sure refresh_token and projectId are included' };
     }
 
     // 解析每个 token
@@ -482,12 +482,12 @@ function smartParseImportData(jsonText) {
     }
 
     if (validTokens.length === 0) {
-        return { success: false, message: `所有 ${tokensArray.length} 条数据都缺少必需字段 (refresh_token 和 projectId)` };
+        return { success: false, message: `All ${tokensArray.length} records are missing the required fields (refresh_token and projectId)` };
     }
 
     const message = invalidCount > 0
-        ? `解析成功：${validTokens.length} 个有效，${invalidCount} 个无效`
-        : `解析成功：${validTokens.length} 个 Token`;
+        ? `Parse successful: ${validTokens.length} valid, ${invalidCount} invalid`
+        : `Parse successful: ${validTokens.length} tokens`;
 
     return { success: true, tokens: validTokens, message };
 }
@@ -500,7 +500,7 @@ function parseImportJson() {
 
     const jsonText = jsonInput.value.trim();
     if (!jsonText) {
-        statusEl.textContent = '❌ 请输入 JSON 内容';
+        statusEl.textContent = '❌ Please enter JSON content';
         statusEl.className = 'import-json-status error';
         pendingImportData = null;
         confirmBtn.disabled = true;
@@ -554,7 +554,7 @@ async function handleImportFile(file) {
         confirmBtn.disabled = false;
 
     } catch (error) {
-        showToast('读取文件失败: ' + error.message, 'error');
+        showToast('Failed to read file: ' + error.message, 'error');
     }
 }
 
@@ -617,7 +617,7 @@ function closeImportModal() {
     pendingImportData = null;
 }
 
-// 从弹窗确认导入/添加
+// 从弹窗Confirmation导入/添加
 async function confirmImportFromModal() {
     // 手动填入模式
     if (currentImportTab === 'manual') {
@@ -627,11 +627,11 @@ async function confirmImportFromModal() {
         const expiresIn = parseInt(document.getElementById('manualExpiresIn').value) || 3599;
 
         if (!accessToken || !refreshToken) {
-            showToast('请填写完整的Token信息', 'warning');
+            showToast('Please fill in the complete token information', 'warning');
             return;
         }
 
-        showLoading('正在添加Token...');
+        showLoading('Adding token...');
         try {
             const tokenData = { access_token: accessToken, refresh_token: refreshToken, expires_in: expiresIn };
             if (projectId) {
@@ -648,21 +648,21 @@ async function confirmImportFromModal() {
 
             if (data.success) {
                 closeImportModal();
-                showToast('Token添加成功', 'success');
+                showToast('Token added successfully', 'success');
                 loadTokens();
             } else {
-                showToast(data.message || '添加失败', 'error');
+                showToast(data.message || 'Add failed', 'error');
             }
         } catch (error) {
             hideLoading();
-            showToast('添加失败: ' + error.message, 'error');
+            showToast('Add failed: ' + error.message, 'error');
         }
         return;
     }
 
-    // 文件上传或JSON导入模式
+    // 文件上传或JSONImport Mode
     if (!pendingImportData) {
-        showToast('请先选择文件或解析JSON', 'warning');
+        showToast('Please choose a file or parse JSON first', 'warning');
         return;
     }
 
@@ -670,11 +670,11 @@ async function confirmImportFromModal() {
     const password = document.getElementById('importPassword').value;
 
     if (!password) {
-        showToast('请输入管理员密码', 'warning');
+        showToast('Please enter the admin password', 'warning');
         return;
     }
 
-    showLoading('正在导入...');
+    showLoading('Importing...');
     try {
         const response = await authFetch('/admin/tokens/import', {
             method: 'POST',
@@ -692,14 +692,14 @@ async function confirmImportFromModal() {
         } else {
             // 密码错误时显示具体提示
             if (response.status === 403) {
-                showToast('密码错误，请重新输入', 'error');
+                showToast('Incorrect password, please try again', 'error');
             } else {
-                showToast(data.message || '导入失败', 'error');
+                showToast(data.message || 'Import failed', 'error');
             }
         }
     } catch (error) {
         hideLoading();
-        showToast('导入失败: ' + error.message, 'error');
+        showToast('Import failed: ' + error.message, 'error');
     }
 }
 
@@ -710,14 +710,14 @@ function showPasswordPrompt(message) {
         modal.className = 'modal form-modal';
         modal.innerHTML = `
             <div class="modal-content">
-                <div class="modal-title">🔐 密码验证</div>
+                <div class="modal-title">🔐 Password Verification</div>
                 <p>${message}</p>
                 <div class="form-group">
-                    <input type="password" id="promptPassword" placeholder="请输入密码">
+                    <input type="password" id="promptPassword" placeholder="Please enter the password">
                 </div>
                 <div class="modal-actions">
-                    <button class="btn btn-secondary" id="promptCancelBtn">取消</button>
-                    <button class="btn btn-success" id="promptConfirmBtn">确认</button>
+                    <button class="btn btn-secondary" id="promptCancelBtn">Cancel</button>
+                    <button class="btn btn-success" id="promptConfirmBtn">Confirmation</button>
                 </div>
             </div>
         `;
@@ -784,11 +784,11 @@ window.toggleActionBar = function () {
     if (actionBarCollapsed) {
         actionBar.classList.add('collapsed');
         toggleBtn.classList.add('collapsed');
-        toggleBtn.title = '展开操作按钮';
+        toggleBtn.title = 'Expand action buttons';
     } else {
         actionBar.classList.remove('collapsed');
         toggleBtn.classList.remove('collapsed');
-        toggleBtn.title = '收起操作按钮';
+        toggleBtn.title = 'Collapse action buttons';
     }
 }
 
@@ -803,7 +803,7 @@ function initActionBarState() {
     if (actionBarCollapsed) {
         actionBar.classList.add('collapsed');
         toggleBtn.classList.add('collapsed');
-        toggleBtn.title = '展开操作按钮';
+        toggleBtn.title = 'Expand action buttons';
     }
 }
 
@@ -852,10 +852,10 @@ async function loadTokens() {
         if (data.success) {
             renderTokens(data.data);
         } else {
-            showToast('加载失败: ' + (data.message || '未知错误'), 'error');
+            showToast('Load failed: ' + (data.message || 'Unknown error'), 'error');
         }
     } catch (error) {
-        showToast('加载Token失败: ' + error.message, 'error');
+        showToast('Failed to load tokens: ' + error.message, 'error');
     }
 }
 
@@ -890,9 +890,9 @@ function renderTokens(tokens) {
 
     const tokenList = document.getElementById('tokenList');
     if (filteredTokens.length === 0) {
-        const emptyText = currentFilter === 'all' ? '暂无Token' :
-            currentFilter === 'enabled' ? '暂无启用的Token' : '暂无禁用的Token';
-        const emptyHint = currentFilter === 'all' ? '点击上方OAuth按钮添加Token' : '点击上方"总数"查看全部';
+        const emptyText = currentFilter === 'all' ? 'No tokens yet' :
+            currentFilter === 'enabled' ? 'No enabled tokens' : 'No disabled tokens';
+        const emptyHint = currentFilter === 'all' ? 'Use the OAuth button above to add a token' : 'Click "Total" above to view all';
         tokenList.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">📦</div>
@@ -925,25 +925,25 @@ function renderTokens(tokens) {
             <div class="token-header">
                 <div class="token-header-left">
                     <span class="status ${token.enable ? 'enabled' : 'disabled'}">
-                        ${token.enable ? '✅ 启用' : '❌ 禁用'}
+                        ${token.enable ? '✅ Enabled' : '❌ Disabled'}
                     </span>
-                    <button class="btn-icon token-refresh-btn ${isRefreshing ? 'loading' : ''}" id="refresh-btn-${escapeHtml(cardId)}" onclick="manualRefreshToken('${safeTokenId}')" title="刷新Token" ${isRefreshing ? 'disabled' : ''}>🔄</button>
+                    <button class="btn-icon token-refresh-btn ${isRefreshing ? 'loading' : ''}" id="refresh-btn-${escapeHtml(cardId)}" onclick="manualRefreshToken('${safeTokenId}')" title="Refresh token" ${isRefreshing ? 'disabled' : ''}>🔄</button>
                 </div>
                 <div class="token-header-right">
-                    <button class="btn-icon" onclick="showTokenDetail('${safeTokenId}')" title="编辑">✏️</button>
+                    <button class="btn-icon" onclick="showTokenDetail('${safeTokenId}')" title="Edit">✏️</button>
                     <span class="token-id">#${tokenNumber}</span>
                 </div>
             </div>
             <div class="token-info">
-                <div class="info-row editable sensitive-row" onclick="editField(event, '${safeTokenId}', 'projectId', '${safeProjectIdJs}')" title="点击编辑">
+                <div class="info-row editable sensitive-row" onclick="editField(event, '${safeTokenId}', 'projectId', '${safeProjectIdJs}')" title="Click to edit">
                     <span class="info-label">📦</span>
-                    <span class="info-value sensitive-info">${safeProjectId || '点击设置'}</span>
+                    <span class="info-value sensitive-info">${safeProjectId || 'Click to edit'}</span>
                     <span class="info-edit-icon">✏️</span>
-                    <button class="btn btn-xs btn-info fetch-project-btn" onclick="fetchProjectId(event, '${safeTokenId}')" title="从API获取Project ID">🔍</button>
+                    <button class="btn btn-xs btn-info fetch-project-btn" onclick="fetchProjectId(event, '${safeTokenId}')" title="Fetch Project ID from API">🔍</button>
                 </div>
-                <div class="info-row editable sensitive-row" onclick="editField(event, '${safeTokenId}', 'email', '${safeEmailJs}')" title="点击编辑">
+                <div class="info-row editable sensitive-row" onclick="editField(event, '${safeTokenId}', 'email', '${safeEmailJs}')" title="Click to edit">
                     <span class="info-label">📧</span>
-                    <span class="info-value sensitive-info">${safeEmail || '点击设置'}</span>
+                    <span class="info-value sensitive-info">${safeEmail || 'Click to edit'}</span>
                     <span class="info-edit-icon">✏️</span>
                 </div>
             </div>
@@ -953,17 +953,17 @@ function renderTokens(tokens) {
             </div>
             <div class="token-quota-inline" id="quota-inline-${escapeHtml(cardId)}">
                 <div class="quota-inline-header" onclick="toggleQuotaExpand('${escapeJs(cardId)}', '${safeTokenId}')">
-                    <span class="quota-inline-summary" id="quota-summary-${escapeHtml(cardId)}">📊 加载中...</span>
+                    <span class="quota-inline-summary" id="quota-summary-${escapeHtml(cardId)}">📊 Loading...</span>
                     <span class="quota-inline-toggle" id="quota-toggle-${escapeHtml(cardId)}">▼</span>
                 </div>
                 <div class="quota-inline-detail hidden" id="quota-detail-${escapeHtml(cardId)}"></div>
             </div>
             <div class="token-actions">
-                <button class="btn btn-info btn-xs" onclick="showQuotaModal('${safeTokenId}')" title="查看额度">📊 详情</button>
-                <button class="btn ${token.enable ? 'btn-warning' : 'btn-success'} btn-xs" onclick="toggleToken('${safeTokenId}', ${!token.enable})" title="${token.enable ? '禁用' : '启用'}">
-                    ${token.enable ? '⏸️ 禁用' : '▶️ 启用'}
+                <button class="btn btn-info btn-xs" onclick="showQuotaModal('${safeTokenId}')" title="View quota">📊 Details</button>
+                <button class="btn ${token.enable ? 'btn-warning' : 'btn-success'} btn-xs" onclick="toggleToken('${safeTokenId}', ${!token.enable})" title="${token.enable ? 'Disable' : 'Enable'}">
+                    ${token.enable ? '⏸️ Disable' : '▶️ Enable'}
                 </button>
-                <button class="btn btn-danger btn-xs" onclick="deleteToken('${safeTokenId}')" title="删除">🗑️ 删除</button>
+                <button class="btn btn-danger btn-xs" onclick="deleteToken('${safeTokenId}')" title="Delete">🗑️ Delete</button>
             </div>
         </div>
     `}).join('');
@@ -981,7 +981,7 @@ function renderTokens(tokens) {
 // 手动刷新 Token（使用 tokenId）
 async function manualRefreshToken(tokenId) {
     if (refreshingTokens.has(tokenId)) {
-        showToast('该 Token 正在刷新中', 'warning');
+        showToast('This token is already refreshing', 'warning');
         return;
     }
     await autoRefreshToken(tokenId);
@@ -1014,7 +1014,7 @@ async function autoRefreshToken(tokenId) {
 
         const data = await response.json();
         if (data.success) {
-            showToast('Token 已自动刷新', 'success');
+            showToast('Token refreshed automatically', 'success');
             // 刷新成功后重新加载列表
             refreshingTokens.delete(tokenId);
             if (card) card.classList.remove('refreshing');
@@ -1025,7 +1025,7 @@ async function autoRefreshToken(tokenId) {
             }
             loadTokens();
         } else {
-            showToast(`Token 刷新失败: ${data.message || '未知错误'}`, 'error');
+            showToast(`Token refresh failed: ${data.message || 'Unknown error'}`, 'error');
             refreshingTokens.delete(tokenId);
             // 更新 UI 显示刷新失败
             if (card) {
@@ -1040,7 +1040,7 @@ async function autoRefreshToken(tokenId) {
         }
     } catch (error) {
         if (error.message !== 'Unauthorized') {
-            showToast(`Token 刷新失败: ${error.message}`, 'error');
+            showToast(`Token refresh failed: ${error.message}`, 'error');
         }
         refreshingTokens.delete(tokenId);
         // 更新 UI 显示刷新失败
@@ -1071,13 +1071,13 @@ function editField(event, tokenId, field, currentValue) {
 
     if (row.querySelector('input')) return;
 
-    const fieldLabels = { projectId: 'Project ID', email: '邮箱' };
+    const fieldLabels = { projectId: 'Project ID', email: 'Email' };
 
     const input = document.createElement('input');
     input.type = field === 'email' ? 'email' : 'text';
     input.value = currentValue;
     input.className = 'inline-edit-input';
-    input.placeholder = `输入${fieldLabels[field]}`;
+    input.placeholder = `Enter ${fieldLabels[field]}`;
 
     valueSpan.style.display = 'none';
     row.insertBefore(input, valueSpan.nextSibling);
@@ -1099,14 +1099,14 @@ function editField(event, tokenId, field, currentValue) {
 
             const data = await response.json();
             if (data.success) {
-                showToast('已保存', 'success');
+                showToast('Saved', 'success');
                 loadTokens();
             } else {
-                showToast(data.message || '保存失败', 'error');
+                showToast(data.message || 'Save failed', 'error');
                 cancel();
             }
         } catch (error) {
-            showToast('保存失败', 'error');
+            showToast('Save failed', 'error');
             cancel();
         }
     };
@@ -1141,7 +1141,7 @@ function editField(event, tokenId, field, currentValue) {
 function showTokenDetail(tokenId) {
     const token = cachedTokens.find(t => t.id === tokenId);
     if (!token) {
-        showToast('Token不存在', 'error');
+        showToast('Token not found', 'error');
         return;
     }
 
@@ -1149,32 +1149,32 @@ function showTokenDetail(tokenId) {
     const safeTokenId = escapeJs(tokenId);
     const safeProjectId = escapeHtml(token.projectId || '');
     const safeEmail = escapeHtml(token.email || '');
-    const updatedAtStr = escapeHtml(token.timestamp ? new Date(token.timestamp).toLocaleString('zh-CN') : '未知');
+    const updatedAtStr = escapeHtml(token.timestamp ? new Date(token.timestamp).toLocaleString('en-US') : 'Unknown');
 
     const modal = document.createElement('div');
     modal.className = 'modal form-modal';
     modal.innerHTML = `
         <div class="modal-content">
-            <div class="modal-title">📝 Token详情</div>
+            <div class="modal-title">📝 Token Details</div>
             <div class="form-group compact">
                 <label>🔑 Token ID</label>
                 <div class="token-display">${escapeHtml(tokenId)}</div>
             </div>
             <div class="form-group compact">
                 <label>📦 Project ID</label>
-                <input type="text" id="editProjectId" value="${safeProjectId}" placeholder="项目ID">
+                <input type="text" id="editProjectId" value="${safeProjectId}" placeholder="Project ID">
             </div>
             <div class="form-group compact">
-                <label>📧 邮箱</label>
-                <input type="email" id="editEmail" value="${safeEmail}" placeholder="账号邮箱">
+                <label>📧 Email</label>
+                <input type="email" id="editEmail" value="${safeEmail}" placeholder="Account Email">
             </div>
             <div class="form-group compact">
-                <label>🕒 最后更新时间</label>
+                <label>🕒 Last Updated</label>
                 <input type="text" value="${updatedAtStr}" readonly style="background: var(--bg); cursor: not-allowed;">
             </div>
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">取消</button>
-                <button class="btn btn-success" onclick="saveTokenDetail('${safeTokenId}')">💾 保存</button>
+                <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                <button class="btn btn-success" onclick="saveTokenDetail('${safeTokenId}')">💾 Save</button>
             </div>
         </div>
     `;
@@ -1186,7 +1186,7 @@ async function saveTokenDetail(tokenId) {
     const projectId = document.getElementById('editProjectId').value.trim();
     const email = document.getElementById('editEmail').value.trim();
 
-    showLoading('保存中...');
+    showLoading('Saving...');
     try {
         const response = await authFetch(`/admin/tokens/${encodeURIComponent(tokenId)}`, {
             method: 'PUT',
@@ -1200,23 +1200,23 @@ async function saveTokenDetail(tokenId) {
         hideLoading();
         if (data.success) {
             document.querySelector('.form-modal').remove();
-            showToast('保存成功', 'success');
+            showToast('Saved successfully', 'success');
             loadTokens();
         } else {
-            showToast(data.message || '保存失败', 'error');
+            showToast(data.message || 'Save failed', 'error');
         }
     } catch (error) {
         hideLoading();
-        showToast('保存失败: ' + error.message, 'error');
+        showToast('Save failed: ' + error.message, 'error');
     }
 }
 
 async function toggleToken(tokenId, enable) {
-    const action = enable ? '启用' : '禁用';
-    const confirmed = await showConfirm(`确定要${action}这个Token吗？`, `${action}确认`);
+    const action = enable ? 'enable' : 'disable';
+    const confirmed = await showConfirm(`Are you sure you want to ${action} this token?`, `Confirm ${action}`);
     if (!confirmed) return;
 
-    showLoading(`正在${action}...`);
+    showLoading(`${action === 'enable' ? 'Enabling' : 'Disabling'}...`);
     try {
         const response = await authFetch(`/admin/tokens/${encodeURIComponent(tokenId)}`, {
             method: 'PUT',
@@ -1229,23 +1229,23 @@ async function toggleToken(tokenId, enable) {
         const data = await response.json();
         hideLoading();
         if (data.success) {
-            showToast(`已${action}`, 'success');
+            showToast(`${action === 'enable' ? 'Enabled' : 'Disabled'}`, 'success');
             skipAnimation = true; // 跳过动画
             loadTokens();
         } else {
-            showToast(data.message || '操作失败', 'error');
+            showToast(data.message || 'Action failed', 'error');
         }
     } catch (error) {
         hideLoading();
-        showToast('操作失败: ' + error.message, 'error');
+        showToast('Action failed: ' + error.message, 'error');
     }
 }
 
 async function deleteToken(tokenId) {
-    const confirmed = await showConfirm('删除后无法恢复，确定删除？', '⚠️ 删除确认');
+    const confirmed = await showConfirm('This action cannot be undone. Delete this token?', '⚠️ Delete Confirmation');
     if (!confirmed) return;
 
-    showLoading('正在删除...');
+    showLoading('Deleting...');
     try {
         const response = await authFetch(`/admin/tokens/${encodeURIComponent(tokenId)}`, {
             method: 'DELETE'
@@ -1254,14 +1254,14 @@ async function deleteToken(tokenId) {
         const data = await response.json();
         hideLoading();
         if (data.success) {
-            showToast('已删除', 'success');
+            showToast('Deleted', 'success');
             loadTokens();
         } else {
-            showToast(data.message || '删除失败', 'error');
+            showToast(data.message || 'Delete failed', 'error');
         }
     } catch (error) {
         hideLoading();
-        showToast('删除失败: ' + error.message, 'error');
+        showToast('Delete failed: ' + error.message, 'error');
     }
 }
 
@@ -1271,14 +1271,14 @@ async function fetchProjectIdForManual() {
     const refreshToken = document.getElementById('manualRefreshToken').value.trim();
 
     if (!accessToken || !refreshToken) {
-        showToast('请先填写 Access Token 和 Refresh Token', 'warning');
+        showToast('Please fill in the Access Token and Refresh Token first', 'warning');
         return;
     }
 
     const btn = document.getElementById('fetchProjectIdBtn');
     const originalText = btn.textContent;
     btn.disabled = true;
-    btn.textContent = '⏳ 获取中...';
+    btn.textContent = '⏳ Fetching...';
 
     try {
         // 先添加 Token（临时），然后获取 Project ID
@@ -1294,7 +1294,7 @@ async function fetchProjectIdForManual() {
 
         const addData = await addResponse.json();
         if (!addData.success) {
-            throw new Error(addData.message || '添加 Token 失败');
+            throw new Error(addData.message || 'Failed to add token');
         }
 
         const tokenId = addData.tokenId;
@@ -1308,21 +1308,21 @@ async function fetchProjectIdForManual() {
 
         if (fetchData.success && fetchData.projectId) {
             document.getElementById('manualProjectId').value = fetchData.projectId;
-            showToast(`获取成功: ${fetchData.projectId}`, 'success');
+            showToast(`Fetched successfully: ${fetchData.projectId}`, 'success');
 
-            // 删除临时添加的 Token（因为用户还没确认）
+            // Delete临时添加的 Token（因为用户还没Confirmation）
             await authFetch(`/admin/tokens/${encodeURIComponent(tokenId)}`, {
                 method: 'DELETE'
             });
         } else {
-            // 删除临时 Token
+            // Delete临时 Token
             await authFetch(`/admin/tokens/${encodeURIComponent(tokenId)}`, {
                 method: 'DELETE'
             });
-            throw new Error(fetchData.message || '该账号无法获取 Project ID');
+            throw new Error(fetchData.message || 'This account cannot fetch a Project ID');
         }
     } catch (error) {
-        showToast('获取失败: ' + error.message, 'error');
+        showToast('Fetch failed: ' + error.message, 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = originalText;

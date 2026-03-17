@@ -49,7 +49,7 @@ document.getElementById('login').addEventListener('submit', async (e) => {
     btn.disabled = true;
     btn.classList.add('loading');
     const originalText = btn.textContent;
-    btn.textContent = '登录中';
+    btn.textContent = 'Signing in...';
     
     try {
         const response = await fetch('/admin/login', {
@@ -62,15 +62,15 @@ document.getElementById('login').addEventListener('submit', async (e) => {
         const data = await response.json();
         if (data.success) {
             // 不再存储 token 到 localStorage，使用 HttpOnly Cookie
-            showToast('登录成功', 'success');
+            showToast('Signed in successfully', 'success');
             showMainContent();
             loadTokens();
             loadConfig();
         } else {
-            showToast(data.message || '用户名或密码错误', 'error');
+            showToast(data.message || 'Invalid username or password', 'error');
         }
     } catch (error) {
-        showToast('登录失败: ' + error.message, 'error');
+        showToast('Sign-in failed: ' + error.message, 'error');
     } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
