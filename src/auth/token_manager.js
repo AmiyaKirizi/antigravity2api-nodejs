@@ -186,7 +186,7 @@ class TokenManager {
         this.requestCountPerToken = jsonConfig.rotation.requestCount || 10;
       }
     } catch (error) {
-      log.warn('加载轮询配置失败，使用默认值:', error.message);
+      log.warn('Failed to load rotation config, using defaults:', error.message);
     }
   }
 
@@ -201,9 +201,9 @@ class TokenManager {
     // 重置计数器
     this.tokenRequestCounts.clear();
     if (this.rotationStrategy === RotationStrategy.REQUEST_COUNT) {
-      log.info(`轮询策略已更新: ${this.rotationStrategy}, 每token请求 ${this.requestCountPerToken} 次后切换`);
+      log.info(`Rotation strategy updated: ${this.rotationStrategy}, switching after ${this.requestCountPerToken} requests per token`);
     } else {
-      log.info(`轮询策略已更新: ${this.rotationStrategy}`);
+      log.info(`Rotation strategy updated: ${this.rotationStrategy}`);
     }
   }
 

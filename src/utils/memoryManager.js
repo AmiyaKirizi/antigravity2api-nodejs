@@ -29,7 +29,7 @@ class MemoryManager {
     if (this.timer) return;
     this.setCleanupInterval(cleanupIntervalMs);
     this.isShuttingDown = false;
-    logger.info(`内存清理器已启动（间隔: ${Math.round(this.cleanupIntervalMs / 1000)}秒）`);
+    logger.info(`Memory cleanup scheduler started (interval: ${Math.round(this.cleanupIntervalMs / 1000)}s)`);
   }
 
   /**
@@ -63,7 +63,7 @@ class MemoryManager {
       this.timer = null;
     }
     this.cleanupCallbacks.clear();
-    logger.info('内存清理器已停止');
+    logger.info('Memory cleanup scheduler stopped');
   }
 
   /**
@@ -91,7 +91,7 @@ class MemoryManager {
       try {
         callback(reason);
       } catch (error) {
-        logger.error('清理回调执行失败:', error.message);
+        logger.error('Cleanup callback failed:', error.message);
       }
     }
   }

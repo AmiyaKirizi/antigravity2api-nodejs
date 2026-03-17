@@ -1,37 +1,37 @@
 #!/bin/bash
 
 echo "========================================"
-echo "Antigravity2API 更新脚本"
+echo "Antigravity2API Update Script"
 echo "========================================"
 echo
 
-echo "[1/3] 保存本地修改..."
+echo "[1/3] Stashing local changes..."
 git stash push -m "Auto stash before update"
 if [ $? -ne 0 ]; then
-    echo "保存修改失败"
+    echo "Failed to stash changes"
     exit 1
 fi
 
 echo
-echo "[2/3] 拉取最新代码..."
+echo "[2/3] Pulling latest code..."
 git pull origin main
 if [ $? -ne 0 ]; then
-    echo "拉取更新失败"
+    echo "Failed to pull updates"
     exit 1
 fi
 
 echo
-echo "[3/3] 安装依赖..."
+echo "[3/3] Installing dependencies..."
 npm install
 
 echo
 echo "========================================"
-echo "更新完成！"
+echo "Update completed!"
 echo "========================================"
 echo
-echo "恢复本地修改："
+echo "To restore your local changes:"
 echo "  git stash pop"
 echo
-echo "删除本地修改："
+echo "To discard your local changes:"
 echo "  git stash drop"
 echo

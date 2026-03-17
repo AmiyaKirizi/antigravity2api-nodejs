@@ -200,9 +200,9 @@ class GeminiCliTokenManager {
     }
     this.tokenRequestCounts.clear();
     if (this.rotationStrategy === RotationStrategy.REQUEST_COUNT) {
-      log.info(`[GeminiCLI] 轮询策略已更新: ${this.rotationStrategy}, 每token请求 ${this.requestCountPerToken} 次后切换`);
+      log.info(`[GeminiCLI] Rotation strategy updated: ${this.rotationStrategy}, switching after ${this.requestCountPerToken} requests per token`);
     } else {
-      log.info(`[GeminiCLI] 轮询策略已更新: ${this.rotationStrategy}`);
+      log.info(`[GeminiCLI] Rotation strategy updated: ${this.rotationStrategy}`);
     }
   }
 

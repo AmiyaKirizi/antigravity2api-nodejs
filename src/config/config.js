@@ -432,13 +432,13 @@ export async function checkAndUpdateVersion() {
     clearTimeout(timeout);
 
     if (!response.ok) {
-      log.warn(`版本检查请求失败: HTTP ${response.status}`);
+      log.warn(`Version check request failed: HTTP ${response.status}`);
       return;
     }
 
     const releases = await response.json();
     if (!Array.isArray(releases) || releases.length === 0 || !releases[0].version) {
-      log.warn('版本检查返回数据格式异常');
+      log.warn('Version check returned data in an unexpected format');
       return;
     }
 
@@ -446,7 +446,7 @@ export async function checkAndUpdateVersion() {
     const currentVersion = config.api.ideVersion;
 
     if (compareVersions(latestVersion, currentVersion) > 0) {
-      log.info(`发现新版本: ${currentVersion} → ${latestVersion}，正在更新配置...`);
+      log.info(`New version detected: ${currentVersion} -> ${latestVersion}, updating configuration...`);
 
       // 更新 config.json
       saveConfigJson({ api: { version: latestVersion } });
@@ -455,15 +455,15 @@ export async function checkAndUpdateVersion() {
       config.api.ideVersion = latestVersion;
       config.api.userAgent = `antigravity/${latestVersion} windows/amd64`;
 
-      log.info(`✓ 版本已更新为 ${latestVersion}`);
+      log.info(`✓ Version updated to ${latestVersion}`);
     } else {
-      log.info(`当前版本 ${currentVersion} 已是最新`);
+      log.info(`Current version ${currentVersion} is already up to date`);
     }
   } catch (err) {
     if (err.name === 'AbortError') {
-      log.warn('版本检查超时，跳过更新');
+      log.warn('Version check timed out, skipping update');
     } else {
-      log.warn(`版本检查失败: ${err.message}`);
+      log.warn(`Version check failed: ${err.message}`);
     }
   }
 }
@@ -471,7 +471,7 @@ export async function checkAndUpdateVersion() {
 // 显示生成的凭据提示
 displayGeneratedCredentials();
 
-log.info('✓ 配置加载成功');
+log.info('✓ Configuration loaded successfully');
 
 export default config;
 

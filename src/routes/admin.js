@@ -152,7 +152,7 @@ router.get('/tokens', cookieAuthMiddleware, async (req, res) => {
 router.post('/tokens', cookieAuthMiddleware, async (req, res) => {
   const { access_token, refresh_token, expires_in, timestamp, enable, projectId, email, sub } = req.body;
   if (!access_token || !refresh_token) {
-    return res.status(400).json({ success: false, message: 'access_token和refresh_token必填' });
+    return res.status(400).json({ success: false, message: 'access_token and refresh_token are required' });
   }
   const tokenData = { access_token, refresh_token, expires_in, sub };
   if (timestamp) tokenData.timestamp = timestamp;
@@ -218,7 +218,7 @@ router.post('/tokens/:tokenId/refresh', cookieAuthMiddleware, async (req, res) =
   try {
     const result = await tokenManager.refreshTokenById(tokenId);
     logger.info(`手动刷新Token: ${tokenId}`);
-    res.json({ success: true, message: 'Token刷新成功', data: result });
+    res.json({ success: true, message: 'Token refreshed successfully', data: result });
   } catch (error) {
     logger.error('刷新Token失败:', error.message);
     const status = error.statusCode || 500;
@@ -232,7 +232,7 @@ router.post('/tokens/:tokenId/fetch-project-id', cookieAuthMiddleware, async (re
   try {
     const result = await tokenManager.fetchProjectIdForToken(tokenId);
     logger.info(`手动获取ProjectId: ${tokenId} -> ${result.projectId}`);
-    res.json({ success: true, message: 'Project ID获取成功', projectId: result.projectId });
+    res.json({ success: true, message: 'Project ID fetched successfully', projectId: result.projectId });
   } catch (error) {
     logger.error('获取ProjectId失败:', error.message);
     const status = error.statusCode || 500;
@@ -245,7 +245,7 @@ router.post('/tokens/export', cookieAuthMiddleware, async (req, res) => {
   const { password } = req.body;
 
   if (!password || !verifyPassword(password)) {
-    return res.status(403).json({ success: false, message: '密码验证失败' });
+    return res.status(403).json({ success: false, message: 'Password verification failed' });
   }
 
   try {
@@ -426,11 +426,11 @@ router.post('/tokens/import', cookieAuthMiddleware, async (req, res) => {
   const { password, data, mode = 'merge' } = req.body;
 
   if (!password || !verifyPassword(password)) {
-    return res.status(403).json({ success: false, message: '密码验证失败' });
+    return res.status(403).json({ success: false, message: 'Password verification failed' });
   }
 
   if (!data || !data.tokens || !Array.isArray(data.tokens)) {
-    return res.status(400).json({ success: false, message: '无效的导入数据格式' });
+    return res.status(400).json({ success: false, message: 'Invalid import data format' });
   }
 
   try {
@@ -482,7 +482,7 @@ router.post('/tokens/import', cookieAuthMiddleware, async (req, res) => {
     logger.info(`导入Token: 新增 ${addedCount}, 更新 ${updatedCount}, 跳过 ${skippedCount}`);
     res.json({
       success: true,
-      message: `导入完成：新增 ${addedCount} 个，更新 ${updatedCount} 个，跳过 ${skippedCount} 个`,
+      message: `Import complete: added ${addedCount}, updated ${updatedCount}, skipped ${skippedCount}`,
       data: { added: addedCount, updated: updatedCount, skipped: skippedCount }
     });
   } catch (error) {
@@ -524,7 +524,7 @@ router.get('/config', cookieAuthMiddleware, (req, res) => {
 
     res.json({ success: true, data: { env: envData, json: jsonData } });
   } catch (error) {
-    logger.error('读取配置失败:', error.message);
+    logger.error('Failed to read configuration:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -545,10 +545,10 @@ router.put('/config', cookieAuthMiddleware, (req, res) => {
       // 只有当值真正改变时才检查
       if (newValue !== oldValue) {
         if (!password || !verifyPassword(password)) {
-          logger.warn(`尝试修改官方系统提示词但密码验证失败 IP: ${getClientIP(req)}`);
+          logger.warn(`Attempted to modify the official system prompt but admin password verification failed. IP: ${getClientIP(req)}`);
           return res.status(403).json({
             success: false,
-            message: '修改官方系统提示词需要验证管理员密码'
+            message: 'Changing the official system prompt requires admin password verification'
           });
         }
       }
@@ -563,10 +563,10 @@ router.put('/config', cookieAuthMiddleware, (req, res) => {
     // 应用可热更新的运行时配置
     memoryManager.setCleanupInterval(config.server.memoryCleanupInterval);
 
-    logger.info('系统配置已更新并热重载');
-    res.json({ success: true, message: '配置已保存并生效（端口/HOST修改需重启）' });
+    logger.info('System configuration updated and hot-reloaded');
+    res.json({ success: true, message: 'Configuration saved and applied (port/HOST changes require a restart)' });
   } catch (error) {
-    logger.error('更新配置失败:', error.message);
+    logger.error('Failed to update configuration:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -577,7 +577,7 @@ router.get('/rotation', cookieAuthMiddleware, (req, res) => {
     const rotationConfig = tokenManager.getRotationConfig();
     res.json({ success: true, data: rotationConfig });
   } catch (error) {
-    logger.error('获取轮询配置失败:', error.message);
+    logger.error('Failed to get rotation config:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -592,7 +592,7 @@ router.put('/rotation', cookieAuthMiddleware, (req, res) => {
     if (strategy && !validStrategies.includes(strategy)) {
       return res.status(400).json({
         success: false,
-        message: `无效的策略，可选值: ${validStrategies.join(', ')}`
+        message: `Invalid strategy. Valid values: ${validStrategies.join(', ')}`
       });
     }
 
@@ -609,10 +609,10 @@ router.put('/rotation', cookieAuthMiddleware, (req, res) => {
     // 重载配置到内存
     reloadConfig();
 
-    logger.info(`轮询策略已更新: ${strategy || '未变'}, 请求次数: ${requestCount || '未变'}`);
-    res.json({ success: true, message: '轮询策略已更新', data: tokenManager.getRotationConfig() });
+    logger.info(`Rotation strategy updated: ${strategy || 'unchanged'}, request count: ${requestCount || 'unchanged'}`);
+    res.json({ success: true, message: 'Rotation strategy updated', data: tokenManager.getRotationConfig() });
   } catch (error) {
-    logger.error('更新轮询配置失败:', error.message);
+    logger.error('Failed to update rotation config:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -633,7 +633,7 @@ router.get('/logs', cookieAuthMiddleware, (req, res) => {
     const result = logger.getLogs(options);
     res.json({ success: true, data: result });
   } catch (error) {
-    logger.error('获取日志失败:', error.message);
+    logger.error('Failed to get logs:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -644,7 +644,7 @@ router.get('/logs/stats', cookieAuthMiddleware, (req, res) => {
     const stats = logger.getLogStats();
     res.json({ success: true, data: stats });
   } catch (error) {
-    logger.error('获取日志统计失败:', error.message);
+    logger.error('Failed to get log stats:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -653,10 +653,10 @@ router.get('/logs/stats', cookieAuthMiddleware, (req, res) => {
 router.delete('/logs', cookieAuthMiddleware, (req, res) => {
   try {
     logger.clearLogs();
-    logger.info('日志已清空');
-    res.json({ success: true, message: '日志已清空' });
+    logger.info('Logs cleared');
+    res.json({ success: true, message: 'Logs cleared' });
   } catch (error) {
-    logger.error('清空日志失败:', error.message);
+    logger.error('Failed to clear logs:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -671,7 +671,7 @@ router.get('/geminicli/tokens', cookieAuthMiddleware, async (req, res) => {
     const tokens = await geminicliTokenManager.getTokenList();
     res.json({ success: true, data: tokens });
   } catch (error) {
-    logger.error('[GeminiCLI] 获取Token列表失败:', error.message);
+    logger.error('[GeminiCLI] Failed to get token list:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -680,7 +680,7 @@ router.get('/geminicli/tokens', cookieAuthMiddleware, async (req, res) => {
 router.post('/geminicli/tokens', cookieAuthMiddleware, async (req, res) => {
   const { access_token, refresh_token, expires_in, timestamp, enable, email } = req.body;
   if (!access_token || !refresh_token) {
-    return res.status(400).json({ success: false, message: 'access_token和refresh_token必填' });
+    return res.status(400).json({ success: false, message: 'access_token and refresh_token are required' });
   }
   const tokenData = { access_token, refresh_token, expires_in };
   if (timestamp) tokenData.timestamp = timestamp;
@@ -689,10 +689,10 @@ router.post('/geminicli/tokens', cookieAuthMiddleware, async (req, res) => {
 
   try {
     const result = await geminicliTokenManager.addToken(tokenData);
-    logger.info(`[GeminiCLI] 添加新Token: ${access_token.substring(0, 8)}...`);
+    logger.info(`[GeminiCLI] Added new token: ${access_token.substring(0, 8)}...`);
     res.json(result);
   } catch (error) {
-    logger.error('[GeminiCLI] 添加Token失败:', error.message);
+    logger.error('[GeminiCLI] Failed to add token:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -708,10 +708,10 @@ router.put('/geminicli/tokens/:tokenId', cookieAuthMiddleware, async (req, res) 
 
   try {
     const result = await geminicliTokenManager.updateTokenById(tokenId, updates);
-    logger.info(`[GeminiCLI] 更新Token: ${tokenId}`);
+    logger.info(`[GeminiCLI] Updated token: ${tokenId}`);
     res.json(result);
   } catch (error) {
-    logger.error('[GeminiCLI] 更新Token失败:', error.message);
+    logger.error('[GeminiCLI] Failed to update token:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -721,10 +721,10 @@ router.delete('/geminicli/tokens/:tokenId', cookieAuthMiddleware, async (req, re
   const { tokenId } = req.params;
   try {
     const result = await geminicliTokenManager.deleteTokenById(tokenId);
-    logger.info(`[GeminiCLI] 删除Token: ${tokenId}`);
+    logger.info(`[GeminiCLI] Deleted token: ${tokenId}`);
     res.json(result);
   } catch (error) {
-    logger.error('[GeminiCLI] 删除Token失败:', error.message);
+    logger.error('[GeminiCLI] Failed to delete token:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -733,10 +733,10 @@ router.delete('/geminicli/tokens/:tokenId', cookieAuthMiddleware, async (req, re
 router.post('/geminicli/tokens/reload', cookieAuthMiddleware, async (req, res) => {
   try {
     await geminicliTokenManager.reload();
-    logger.info('[GeminiCLI] 手动触发Token热重载');
-    res.json({ success: true, message: 'Gemini CLI Token已热重载' });
+    logger.info('[GeminiCLI] Manually triggered token hot reload');
+    res.json({ success: true, message: 'Gemini CLI tokens hot-reloaded' });
   } catch (error) {
-    logger.error('[GeminiCLI] 热重载失败:', error.message);
+    logger.error('[GeminiCLI] Hot reload failed:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -746,10 +746,10 @@ router.post('/geminicli/tokens/:tokenId/refresh', cookieAuthMiddleware, async (r
   const { tokenId } = req.params;
   try {
     const result = await geminicliTokenManager.refreshTokenById(tokenId);
-    logger.info(`[GeminiCLI] 手动刷新Token: ${tokenId}`);
-    res.json({ success: true, message: 'Token刷新成功', data: result });
+    logger.info(`[GeminiCLI] Manually refreshed token: ${tokenId}`);
+    res.json({ success: true, message: 'Token refreshed successfully', data: result });
   } catch (error) {
-    logger.error('[GeminiCLI] 刷新Token失败:', error.message);
+    logger.error('[GeminiCLI] Failed to refresh token:', error.message);
     const status = error.statusCode || 500;
     res.status(status).json({ success: false, message: error.message });
   }
@@ -760,10 +760,10 @@ router.post('/geminicli/tokens/:tokenId/fetch-project-id', cookieAuthMiddleware,
   const { tokenId } = req.params;
   try {
     const result = await geminicliTokenManager.fetchProjectIdForToken(tokenId);
-    logger.info(`[GeminiCLI] 手动获取ProjectId: ${tokenId} -> ${result.projectId}`);
-    res.json({ success: true, message: 'Project ID获取成功', projectId: result.projectId });
+    logger.info(`[GeminiCLI] Manually fetched Project ID: ${tokenId} -> ${result.projectId}`);
+    res.json({ success: true, message: 'Project ID fetched successfully', projectId: result.projectId });
   } catch (error) {
-    logger.error('[GeminiCLI] 获取ProjectId失败:', error.message);
+    logger.error('[GeminiCLI] Failed to fetch Project ID:', error.message);
     const status = error.statusCode || 500;
     res.status(status).json({ success: false, message: error.message });
   }
@@ -774,13 +774,13 @@ router.post('/geminicli/tokens/export', cookieAuthMiddleware, async (req, res) =
   const { password } = req.body;
 
   if (!password || !verifyPassword(password)) {
-    return res.status(403).json({ success: false, message: '密码验证失败' });
+    return res.status(403).json({ success: false, message: 'Password verification failed' });
   }
 
   try {
     const allTokens = await geminicliTokenManager.store.readAll();
 
-    logger.info('[GeminiCLI] 导出所有Token数据');
+    logger.info('[GeminiCLI] Exported all token data');
     const exportData = {
       version: 1,
       exportTime: new Date().toISOString(),
@@ -797,7 +797,7 @@ router.post('/geminicli/tokens/export', cookieAuthMiddleware, async (req, res) =
 
     res.json({ success: true, data: exportData });
   } catch (error) {
-    logger.error('[GeminiCLI] 导出Token失败:', error.message);
+    logger.error('[GeminiCLI] Failed to export tokens:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -807,13 +807,13 @@ router.post('/geminicli/tokens/import', cookieAuthMiddleware, async (req, res) =
   const { password, data, mode = 'merge' } = req.body;
 
   if (!password || !verifyPassword(password)) {
-    return res.status(403).json({ success: false, message: '密码验证失败' });
+    return res.status(403).json({ success: false, message: 'Password verification failed' });
   }
 
   const importList = extractGeminiCliImportList(data);
 
   if (!Array.isArray(importList)) {
-    return res.status(400).json({ success: false, message: '无效的导入数据格式' });
+    return res.status(400).json({ success: false, message: 'Invalid import data format' });
   }
 
   try {
@@ -854,14 +854,14 @@ router.post('/geminicli/tokens/import', cookieAuthMiddleware, async (req, res) =
 
     await geminicliTokenManager.reload();
 
-    logger.info(`[GeminiCLI] 导入Token: 新增 ${addedCount}, 更新 ${updatedCount}, 跳过 ${skippedCount}`);
+    logger.info(`[GeminiCLI] Imported tokens: added ${addedCount}, updated ${updatedCount}, skipped ${skippedCount}`);
     res.json({
       success: true,
-      message: `导入完成：新增 ${addedCount} 个，更新 ${updatedCount} 个，跳过 ${skippedCount} 个`,
+      message: `Import complete: added ${addedCount}, updated ${updatedCount}, skipped ${skippedCount}`,
       data: { added: addedCount, updated: updatedCount, skipped: skippedCount }
     });
   } catch (error) {
-    logger.error('[GeminiCLI] 导入Token失败:', error.message);
+    logger.error('[GeminiCLI] Failed to import tokens:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -874,7 +874,7 @@ router.get('/blocked-ips', cookieAuthMiddleware, async (req, res) => {
     const list = await ipBlockManager.listBlocked();
     res.json({ success: true, data: list });
   } catch (error) {
-    logger.error('获取封禁列表失败:', error.message);
+    logger.error('Failed to get blocked IP list:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -884,16 +884,16 @@ router.post('/unblock-ip', cookieAuthMiddleware, async (req, res) => {
   try {
     const { ip } = req.body;
     if (!ip) {
-      return res.status(400).json({ success: false, message: 'IP地址必填' });
+      return res.status(400).json({ success: false, message: 'IP address is required' });
     }
     const success = await ipBlockManager.unblock(ip);
     if (success) {
-      res.json({ success: true, message: `IP ${ip} 已解除封禁` });
+      res.json({ success: true, message: `IP ${ip} has been unblocked` });
     } else {
-      res.status(404).json({ success: false, message: 'IP不在封禁列表中' });
+      res.status(404).json({ success: false, message: 'IP is not in the blocked list' });
     }
   } catch (error) {
-    logger.error('解除封禁失败:', error.message);
+    logger.error('Failed to unblock IP:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -904,7 +904,7 @@ router.get('/security-config', cookieAuthMiddleware, async (req, res) => {
     const config = ipBlockManager.getConfig();
     res.json({ success: true, data: config });
   } catch (error) {
-    logger.error('获取安全配置失败:', error.message);
+    logger.error('Failed to get security config:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -916,9 +916,9 @@ router.put('/security-config', cookieAuthMiddleware, async (req, res) => {
     const currentConfig = ipBlockManager.getConfig();
     const mergedConfig = deepMerge(currentConfig, updates);
     await ipBlockManager.updateConfig(mergedConfig);
-    res.json({ success: true, message: '安全配置已更新' });
+    res.json({ success: true, message: 'Security configuration updated' });
   } catch (error) {
-    logger.error('更新安全配置失败:', error.message);
+    logger.error('Failed to update security config:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -928,16 +928,16 @@ router.post('/whitelist-ip', cookieAuthMiddleware, async (req, res) => {
   try {
     const { ip } = req.body;
     if (!ip) {
-      return res.status(400).json({ success: false, message: 'IP地址必填' });
+      return res.status(400).json({ success: false, message: 'IP address is required' });
     }
     const success = await ipBlockManager.addWhitelistIP(ip);
     if (success) {
-      res.json({ success: true, message: `IP ${ip} 已添加到白名单` });
+      res.json({ success: true, message: `IP ${ip} has been added to the whitelist` });
     } else {
-      res.json({ success: false, message: 'IP已在白名单中' });
+      res.json({ success: false, message: 'IP is already in the whitelist' });
     }
   } catch (error) {
-    logger.error('添加白名单失败:', error.message);
+    logger.error('Failed to add whitelist IP:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -947,16 +947,16 @@ router.delete('/whitelist-ip', cookieAuthMiddleware, async (req, res) => {
   try {
     const { ip } = req.body;
     if (!ip) {
-      return res.status(400).json({ success: false, message: 'IP地址必填' });
+      return res.status(400).json({ success: false, message: 'IP address is required' });
     }
     const success = await ipBlockManager.removeWhitelistIP(ip);
     if (success) {
-      res.json({ success: true, message: `IP ${ip} 已从白名单移除` });
+      res.json({ success: true, message: `IP ${ip} has been removed from the whitelist` });
     } else {
-      res.status(404).json({ success: false, message: 'IP不在白名单中' });
+      res.status(404).json({ success: false, message: 'IP is not in the whitelist' });
     }
   } catch (error) {
-    logger.error('移除白名单失败:', error.message);
+    logger.error('Failed to remove whitelist IP:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -973,7 +973,7 @@ router.get('/tokens/:tokenId/quotas', cookieAuthMiddleware, async (req, res) => 
     let tokenData = await tokenManager.findTokenById(tokenId);
 
     if (!tokenData) {
-      return res.status(404).json({ success: false, message: 'Token不存在' });
+      return res.status(404).json({ success: false, message: 'Token not found' });
     }
 
     // 检查 token 是否禁用

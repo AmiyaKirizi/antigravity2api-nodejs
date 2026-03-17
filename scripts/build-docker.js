@@ -14,30 +14,30 @@ const configFile = path.join(rootDir, 'config.json');
 const envExample = path.join(rootDir, '.env.example');
 const configExample = path.join(rootDir, 'config.json.example');
 
-console.log('🐳 开始构建 Docker 镜像...\n');
+console.log('🐳 Starting Docker image build...\n');
 
 // 检查并复制 .env
 if (!fs.existsSync(envFile)) {
   if (fs.existsSync(envExample)) {
     fs.copyFileSync(envExample, envFile);
-    console.log('✓ 已从 .env.example 创建 .env');
+    console.log('✓ Created .env from .env.example');
   } else {
-    console.warn('⚠ 未找到 .env.example，将使用默认配置');
+    console.warn('⚠ .env.example not found, using default configuration');
   }
 } else {
-  console.log('✓ .env 已存在');
+  console.log('✓ .env already exists');
 }
 
 // 检查并复制 config.json
 if (!fs.existsSync(configFile)) {
   if (fs.existsSync(configExample)) {
     fs.copyFileSync(configExample, configFile);
-    console.log('✓ 已从 config.json.example 创建 config.json');
+    console.log('✓ Created config.json from config.json.example');
   } else {
-    console.warn('⚠ 未找到 config.json.example，将使用默认配置');
+    console.warn('⚠ config.json.example not found, using default configuration');
   }
 } else {
-  console.log('✓ config.json 已存在');
+  console.log('✓ config.json already exists');
 }
 
 // 确保必要的目录存在（防止 Docker 挂载时创建文件夹）
@@ -46,25 +46,25 @@ const imagesDir = path.join(rootDir, 'public', 'images');
 
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
-  console.log('✓ 已创建 data 目录');
+  console.log('✓ Created data directory');
 }
 
 if (!fs.existsSync(imagesDir)) {
   fs.mkdirSync(imagesDir, { recursive: true });
-  console.log('✓ 已创建 public/images 目录');
+  console.log('✓ Created public/images directory');
 }
 
 // 构建镜像
-console.log('\n📦 正在构建镜像...\n');
+console.log('\n📦 Building image...\n');
 try {
   execSync('docker compose build', { 
     cwd: rootDir, 
     stdio: 'inherit' 
   });
-  console.log('\n✅ 镜像构建成功！');
-  console.log('\n运行以下命令启动服务：');
+  console.log('\n✅ Image build completed successfully!');
+  console.log('\nRun the following command to start the service:');
   console.log('  docker compose up -d');
 } catch (error) {
-  console.error('\n❌ 构建失败');
+  console.error('\n❌ Build failed');
   process.exit(1);
 }
